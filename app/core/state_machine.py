@@ -58,6 +58,11 @@ class ChatStateMachine:
             if data:
                 if data.get("destination"): self.context["destination"] = data["destination"]
                 if data.get("days"): self.context["days"] = data["days"]
+            else:
+                # Fallback: If LLM fails, assume the message IS the destination if it's short
+                if len(message.split()) < 5:
+                    print(f"DEBUG: LLM failed, using raw message as destination: {message}")
+                    self.context["destination"] = message.strip()
 
             if not self.context["destination"]:
                 self.state = ChatState.NEED_DETAILS

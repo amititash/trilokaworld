@@ -10,7 +10,7 @@ class LLMClient:
         
         if self.provider == "gemini":
             genai.configure(api_key=settings.GEMINI_API_KEY)
-            self.gemini_model = genai.GenerativeModel('gemini-2.0-flash')
+            self.gemini_model = genai.GenerativeModel('gemini-1.5-flash')
         elif self.provider == "openai":
             self.openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
 
