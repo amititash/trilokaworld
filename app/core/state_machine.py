@@ -185,6 +185,11 @@ class ChatStateMachine:
             """
             
             itinerary_json = await llm_client.generate_json(prompt)
+            
+            if not itinerary_json:
+                yield "I'm sorry, I couldn't generate the itinerary at this moment. Please try again or provide more details."
+                return
+
             self.context["itinerary"] = itinerary_json
             
             # Stream the formatted itinerary to user
