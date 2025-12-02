@@ -59,10 +59,19 @@ class ChatStateMachine:
                 if data.get("destination"): self.context["destination"] = data["destination"]
                 if data.get("days"): self.context["days"] = data["days"]
             else:
-                # Fallback: If LLM fails, assume the message IS the destination if it's short
-                if len(message.split()) < 5:
-                    print(f"DEBUG: LLM failed, using raw message as destination: {message}")
-                    self.context["destination"] = message.strip()
+                # Fallback Logic
+                msg_text = message.strip()
+                
+                # Case A: We have destination, looking for days, and input is a number
+                if self.context.get("destination") and not self.context.get("days") and msg_text.isdigit():
+                    self.context["days"] = int(msg_text)
+                
+                # Case B: We don't have destination, assume input is destination
+                elif not self.context.get("destination") and len(msg_text.split()) < 10:
+                     self.context["destination"] = msg_text
+                
+                # Case C: We have destination, maybe user is changing it?
+                # For now, let's stick to the happy path fallback.
 
             if not self.context["destination"]:
                 self.state = ChatState.NEED_DETAILS
