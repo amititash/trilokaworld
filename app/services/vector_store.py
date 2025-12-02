@@ -31,8 +31,8 @@ class VectorStore:
         
         # Load model
         try:
-            print("Loading lighter model (all-MiniLM-L6-v2) for speed...")
-            self.model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+            print("Loading BAAI/bge-m3 model (matching database)...")
+            self.model = SentenceTransformer("BAAI/bge-m3")
             print("Model loaded successfully")
         except Exception as e:
             print(f"Error loading model: {e}")
