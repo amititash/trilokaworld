@@ -150,9 +150,26 @@ class ChatStateMachine:
             # If no direct match, maybe use the top result if it's close enough or just use general knowledge?
             # For now, let's be strict but allow fallback if list is empty but we want to proceed with LLM knowledge
             if not relevant_texts:
-                print(f"DEBUG: No RAG context found for {dest_name}. Proceeding with LLM knowledge only.")
-                # yield f"I currently don't have specific data for {dest_name}, but I'll do my best!"
-                # Don't return, just proceed with empty context
+                print(f"DEBUG: No RAG context found for {dest_name}. Checking backend database...")
+                
+                # Fallback: Check if destination exists in the main database
+                all_destinations = await node_client.get_destinations(self.token)
+                
+                found_in_db = False
+                if isinstance(all_destinations, list):
+                    for d in all_destinations:
+                        if d.get("name") and dest_name.lower() in d.get("name").lower():
+                            found_in_db = True
+                            break
+                
+                if found_in_db:
+                    print(f"DEBUG: Found {dest_name} in backend DB. Proceeding with LLM knowledge.")
+                    # Proceed with empty relevant_texts (LLM will use its own knowledge)
+                else:
+                    print(f"DEBUG: {dest_name} not found in backend DB either. Stopping.")
+                    yield f"I'm sorry, I don't have information about {dest_name} in my database."
+                    self.state = ChatState.INIT
+                    return
             
             yield "Found great spots! Generating your itinerary...\n"
             

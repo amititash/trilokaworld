@@ -92,7 +92,7 @@ def sync():
     )
 
     # 5. Embed and Store
-    batch_size = 10
+    batch_size = 1
     for i in tqdm(range(0, len(all_chunks), batch_size), desc="Syncing to Chroma"):
         batch = all_chunks[i:i+batch_size]
         texts = [c["text"] for c in batch]

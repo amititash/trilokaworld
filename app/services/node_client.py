@@ -39,4 +39,10 @@ class NodeClient:
     async def delete_trip(self, token: str, trip_id: str):
         return await self._request("DELETE", f"/trip/{trip_id}", token)
 
+    async def get_destinations(self, token: str):
+        # Fetch all destinations from the public API
+        # Note: This endpoint might not require a token if it's public, but we pass it for consistency if needed.
+        # Based on routes, /api/destinations is public.
+        return await self._request("GET", "/api/destinations", token)
+
 node_client = NodeClient()

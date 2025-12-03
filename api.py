@@ -95,6 +95,45 @@ def search(request: SearchRequest):
         print(f"Search error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/recommend")
+def recommend(request: SearchRequest):
+    if not vector_store.model or not vector_store.collection:
+        raise HTTPException(status_code=500, detail="Search service not ready")
+
+    try:
+        print(f"Processing recommendation query: {request.query}")
+        
+        # 1. Generate Embedding
+        query_embedding = vector_store.model.encode(request.query, normalize_embeddings=True).tolist()
+
+        # 2. Query ChromaDB (fetch more results to ensure we get enough unique destinations)
+        results = vector_store.collection.query(
+            query_embeddings=[query_embedding],
+            n_results=10, # Fetch more to filter duplicates
+            include=["metadatas", "distances"]
+        )
+
+        # 3. Extract Unique Destinations
+        unique_destinations = []
+        seen = set()
+        
+        if results["ids"] and len(results["ids"][0]) > 0:
+            metas = results["metadatas"][0]
+            for meta in metas:
+                dest_name = meta.get("destination")
+                if dest_name and dest_name not in seen:
+                    unique_destinations.append(dest_name)
+                    seen.add(dest_name)
+                    
+                    if len(unique_destinations) >= request.top_k:
+                        break
+        
+        return {"recommendations": unique_destinations}
+
+    except Exception as e:
+        print(f"Recommendation error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.websocket("/ws/chat")
 async def websocket_endpoint(websocket: WebSocket, token: str):
     print(f"=== WebSocket connection attempt with token: {token[:20]}...")
