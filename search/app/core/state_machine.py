@@ -257,7 +257,11 @@ async def process_messages(websocket: WebSocket, token: int):
 	- Provide practical travel advice including suggested activities, timing, and logistics
 	- If the request is unclear, ask clarifying questions
 	- Do not confirm your understanding of what action they want to take
-	- Do not be verbose about your tasks	 
+	- Do not be verbose about your tasks	
+
+	Functions:
+	- Use plan_destination_trip when user want to/ create a itinerary.
+	- Use crud_itinerary to perform crud operations with itinerary
 	"""}]
 	message_arr.extend(get_messages(token=token,k=10))
 	response_text = ""

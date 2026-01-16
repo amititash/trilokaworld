@@ -1,4 +1,4 @@
-import google.generativeai as genai
+# import google.generativeai as genai
 from openai import AsyncOpenAI
 from app.core.config import settings
 import json

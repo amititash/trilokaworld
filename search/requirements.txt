@@ -10,4 +10,4 @@ openai
 python-dotenv
 firebase-admin
 pymongo
-portkey-ai==2.1.0
+portkey-ai

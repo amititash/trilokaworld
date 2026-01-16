@@ -1,0 +1,9 @@
+node_modules/
+*.pem
+db_dump.archive
+server.log
+*.log
+.env
+venv/
+__pycache__/
+*.pyc

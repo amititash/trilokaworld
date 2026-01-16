@@ -1,24 +1,58 @@
+
 services:
-  web:
-    build: .
-    container_name: triloka_search
+  triloka-backend:
+    build: ./backend
+    container_name: triloka-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    env_file:
+      - ./backend/.env
+    environment:
+      PORT: 5000
+      MONGO_URI: ${MONGO_URI}
+      SEARCH_SERVICE_URL: http://triloka-search:8000
+      FRONTEND_URL: ${FRONTEND_URL}
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY}
+      USE_FAKE_AUTH: ${USE_FAKE_AUTH}
+      FIREBASE_PRIVATE_KEY: ${FIREBASE_PRIVATE_KEY}
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID}
+      FIREBASE_CLIENT_EMAIL: ${FIREBASE_CLIENT_EMAIL}
+    depends_on:
+      - triloka-search
+    networks:
+      - app-network
+
+  triloka-search:
+    build: ./search
+    container_name: triloka-search
+    restart: unless-stopped
     ports:
       - "8000:8000"
     volumes:
-      - .:/app
+      - ./search:/app
       - chroma_data:/app/chroma_off
-    environment:
-      - DEV=${DEV:-false}
-      - MODEL_PROVIDER=${MODEL_PROVIDER:-gemini}
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - NODE_API_URL=${NODE_API_URL:-http://localhost:5000}
-      - PORT_KEY_API_KEY=${PORT_KEY_API_KEY}
-      - PORT_KEY_ID=${PORT_KEY_ID}
-      - ANONYMIZED_TELEMETRY=False
-      - CHROMA_TELEMETRY=False
+      - huggingface_cache:/root/.cache/huggingface
     env_file:
-      - .env
+      - ./search/.env
+    environment:
+      DEV: ${DEV:-false}
+      MODEL_PROVIDER: ${MODEL_PROVIDER:-gemini}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      NODE_API_URL: ${NODE_API_URL:-http://triloka-backend:5000}
+      PORTKEY_API_KEY: ${PORTKEY_API_KEY}
+      PORTKEY_CONFIG: ${PORTKEY_CONFIG}
+      PINECONE_API_KEY: ${PINECONE_API_KEY}
+      PINECONE_INDEX_NAME: ${PINECONE_INDEX_NAME}
+      ANONYMIZED_TELEMETRY: "False"
+      CHROMA_TELEMETRY: "False"
+      HF_HUB_DOWNLOAD_TIMEOUT: "300"
+      HF_HUB_TIMEOUT: "300"
+      HF_HUB_READ_TIMEOUT: "300"
     command: >
       sh -c "
       if [ \"$$DEV\" = \"true\" ]; then
@@ -27,7 +61,13 @@ services:
         uvicorn api:app --host 0.0.0.0 --port 8000;
       fi
       "
-    restart: unless-stopped
+    networks:
+      - app-network
 
 volumes:
   chroma_data:
+  huggingface_cache:
+
+networks:
+  app-network:
+    driver: bridge

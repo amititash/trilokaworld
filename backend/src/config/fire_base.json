@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "bhaskar-triloka",
+  "private_key_id": "cf2d2ac1b8c4aa73fcc39095d7161ed5ccc24e0c",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDKTjZGedSsCPsx\nRIVZqTd71LG7QaJaIDpB+QO9zGh87O1TCYZWWWkSR9k9FYJFDwF+2kmPlC54/uSR\n5behvhUrCQvt7a5G4XOL5TQJosEKbRAoc04Ibr8vtWzk0KyzJ+ZVV1+KrVB7Hysz\nQ2kzLXGyjz/U45YX30qM6Bd5xUhGEkUYgh1fM18eR6RKIDx4NW1VhM2zHbcm3tD9\nD7otyFml4insj3FXCo/Nh1Aj/NrJoURCYpp7pEvQ4qU2VNjZosoUcsmWs6fOj6CA\nll5jvuRIiN2GtyZK18uwh0zfMmN7I0Wwu3ppsmqX3HhUn9IPYSkVip8T/Vlo01GT\nu+Hin/ADAgMBAAECggEAB20/adWFvK3bU6lkmda8xJnmaNQigShNhM5LvsQW+LF7\n9U0hHOEAZ5B/eNIZOHuYcVwGULQlNptPSc0PywTFSZF188CcSFoOpo3KzyjytduS\n7C4IQp/9YP0W9Jl1u/suTGckonZbwRrzHr+OFTf8XgxxnYxs6w7Vixgag7jKpYo4\n0dobRlftrx4wsHCgoGDtKO1Z/enVsXWOR3MPw2NP+hz8TvDMeh2oIuz8ZAHrTdGz\n4GXrnHsw5a4LDkooaoBUi3QfS0mYG0RAMSDA+s5VvuZmj44PME+UuaoTaV272ioc\nnhla6noDlAevr/+TqNqnWWbG+ChkkHH1r5UURDNh8QKBgQDyRRAlewkLNPpW81lZ\ncGzBgec8H31zTLB819F7XbNBfExfzbMZEK1/kvqF7yvVcXNqyr9HorFaLqnFJDg/\nWSHCDIGNhZ6N7tqDplSKk0k0aflF82Vcr2C/Ic93w8iwXwQGN9HTM79WOwFHehZG\ncT51mVOPZQ2EPqVJmUAfgYCEUwKBgQDVxVVEnVo3wGnJNmrW4Ng5OP8/GxZn6eGT\nGtUYMXIV5K5goLTCoAx85u85NXQxHYyX0Lh8kZfwGsOiZRW/HCCPQ1HjUC6Qf5in\nXMITnnrMsNgnZbZNw/zA+9jXhJxbbqdXij0FHB8wcvBlP8kYUFod1Mtkn3AJrqmI\nQYXv5BdvkQKBgQCijPwcacTTpCQjmvtkKy6NV1+S034UkmwIF7YSE/hmA8Qqs5Vr\nR+lhI3i7zJGYkJpkGMzmf56HZ6+4+mhS+LbRwBpcnj6X9J7gngUzRUdkx4XdDUYB\nPhqno0PUk6Rf0iCdG27JSnsinExrbNrtQKYruUh7ec3r4Sx9iTmg6f8UyQKBgH5u\nlMzdJ+O7eJWaCryGBTxq2oQPWEQjTtf7UbdaXzhVpVDfG6nUkS46Q5iZZdw6ttF/\nj+2VCsDmg3iDwsXiM9unnEIORUwPO1EZCmwiGkz/9wfuH1GFLfNRwOFOvE9TdcPP\nreFczZGRGV84x44K0BG+roEXz2Lam8hLwJSuWbIRAoGAXuYoRY/UVKuARGPNZwuh\n7y0WWclzoV6MDp+BHsoqGIMQffqLFx+1TL6GdBmF6kmwpSbPGoSmy5iz9V4eneP6\ntO0s7iCW+YLHLf/A1NpCT7Qn+ApzDNVsdzGhh96dqv7Tdy1T73yxE9zzL/q+1FWM\nFrE7B/VKYStuDMEDSNxfIFU=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@bhaskar-triloka.iam.gserviceaccount.com",
+  "client_id": "102579566548264105060",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40bhaskar-triloka.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
