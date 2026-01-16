@@ -1,12 +1,13 @@
 fastapi
-uvicorn
+uvicorn[standard]
 chromadb
 sentence-transformers
 pydantic
+pydantic-settings
 websockets
 httpx
-google-generativeai>=0.7.0
 openai
 python-dotenv
 firebase-admin
 pymongo
+portkey-ai==2.1.0

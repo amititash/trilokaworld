@@ -1,12 +1,9 @@
-import os
 import traceback
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
-from chromadb import PersistentClient
-from sentence_transformers import SentenceTransformer
 import uvicorn
-from app.core.state_machine import ChatStateMachine
-
+from app.core.state_machine import process_messages
+from chat_manager import add_message, get_messages
 # -----------------------------
 # CONFIG
 # -----------------------------
@@ -32,6 +29,16 @@ async def startup_event():
     # Load model in background or blocking? Blocking is safer for now to ensure readiness.
     # If we want faster startup, we can use asyncio.create_task, but then requests might fail early.
     # Given the issue is import-time hang, blocking here is fine as uvicorn is already running.
+
+    # Sync MongoDB to ChromaDB on startup
+    print("Syncing MongoDB to ChromaDB...")
+    try:
+        from sync_mongo_to_chroma import sync
+        sync()
+        print("Sync completed successfully!")
+    except Exception as e:
+        print(f"Error during sync: {e}")
+
     vector_store.load_model()
 
 # -----------------------------
@@ -134,41 +141,45 @@ def recommend(request: SearchRequest):
         print(f"Recommendation error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.websocket("/ws/chat")
 async def websocket_endpoint(websocket: WebSocket, token: str):
-    print(f"=== WebSocket connection attempt with token: {token[:20]}...")
     await websocket.accept()
     print(f"=== WebSocket accepted ===")
     
     # Initialize State Machine for this connection
     try:
-        print("Initializing ChatStateMachine...")
-        sm = ChatStateMachine(token=token)
-        print("ChatStateMachine initialized successfully")
-    except Exception as e:
-        print(f"ERROR: Failed to initialize ChatStateMachine: {e}")
-        traceback.print_exc()
-        await websocket.send_text(f"Server error: Could not initialize chat. {str(e)}")
-        await websocket.close()
-        return
+    #     print("Initializing ChatStateMachine...")
+    #     sm = ChatStateMachine(token=token)
+    #     print("ChatStateMachine initialized successfully")
+    # except Exception as e:
+    #     print(f"ERROR: Failed to initialize ChatStateMachine: {e}")
+    #     traceback.print_exc()
+    #     await websocket.send_text(f"Server error: Could not initialize chat. {str(e)}")
+    #     await websocket.close()
+    #     return
     
-    try:
+    # try:
         while True:
             data = await websocket.receive_text()
-            print(f"=== Received message: {data} ===")
-            
-            try:
-                # Process message through State Machine
-                response_count = 0
-                async for response in sm.handle_message(data):
-                    response_count += 1
-                    print(f"Sending response #{response_count}: {response[:100]}...")
+            add_message(token=token,message=data)
+            async for response in process_messages(websocket,token):
+                if response:
                     await websocket.send_text(response)
-                print(f"=== Sent {response_count} responses ===")
-            except Exception as msg_error:
-                print(f"ERROR processing message: {msg_error}")
-                traceback.print_exc()
-                await websocket.send_text(f"Error: {str(msg_error)}")
+    #         print(f"=== Received message: {data} ===")
+            
+    #         try:
+    #             # Process message through State Machine
+    #             response_count = 0
+    #             async for response in sm.handle_message(data):
+    #                 response_count += 1
+    #                 print(f"Sending response #{response_count}: {response[:100]}...")
+    #                 await websocket.send_text(response)
+    #             print(f"=== Sent {response_count} responses ===")
+    #         except Exception as msg_error:
+    #             print(f"ERROR processing message: {msg_error}")
+    #             traceback.print_exc()
+    #             await websocket.send_text(f"Error: {str(msg_error)}")
                 
     except WebSocketDisconnect:
         print("=== WebSocket disconnected by client ===")

@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Config
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://mongo:27017/")
+MONGO_URI = "mongodb+srv://mihir:adaptiv@cluster0.vgaf45a.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 DB_NAME = "ai_travel"
 CHROMA_DIR = "chroma_off"
 COLLECTION_NAME = "bge_m3_embeddings"
@@ -114,5 +114,5 @@ def sync():
 
     print("\nSync Complete! AI is now using data from MongoDB.")
 
-if __name__ == "__main__":
-    sync()
+# if __name__ == "__main__":
+#     sync()
