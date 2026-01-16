@@ -5,16 +5,16 @@ services:
     container_name: triloka-backend
     restart: unless-stopped
     ports:
-      - "5000:5000"
+      - "3000:3000"
     volumes:
       - ./backend:/app
       - /app/node_modules
     env_file:
       - ./backend/.env
     environment:
-      PORT: 5000
+      PORT: 3000
       MONGO_URI: ${MONGO_URI}
-      SEARCH_SERVICE_URL: http://triloka-search:8000
+      SEARCH_SERVICE_URL: http://triloka-search:8003
       FRONTEND_URL: ${FRONTEND_URL}
       OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY}
       USE_FAKE_AUTH: ${USE_FAKE_AUTH}
@@ -31,7 +31,7 @@ services:
     container_name: triloka-search
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "8003:8003"
     volumes:
       - ./search:/app
       - chroma_data:/app/chroma_off
@@ -43,7 +43,7 @@ services:
       MODEL_PROVIDER: ${MODEL_PROVIDER:-gemini}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
-      NODE_API_URL: ${NODE_API_URL:-http://triloka-backend:5000}
+      NODE_API_URL: ${NODE_API_URL:-http://triloka-backend:3000}
       PORTKEY_API_KEY: ${PORTKEY_API_KEY}
       PORTKEY_CONFIG: ${PORTKEY_CONFIG}
       PINECONE_API_KEY: ${PINECONE_API_KEY}
@@ -56,9 +56,9 @@ services:
     command: >
       sh -c "
       if [ \"$$DEV\" = \"true\" ]; then
-        uvicorn api:app --host 0.0.0.0 --port 8000 --reload;
+        uvicorn api:app --host 0.0.0.0 --port 8003 --reload;
       else
-        uvicorn api:app --host 0.0.0.0 --port 8000;
+        uvicorn api:app --host 0.0.0.0 --port 8003;
       fi
       "
     networks:
