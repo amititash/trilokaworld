@@ -1,5 +1,5 @@
 services:
-  web:
+  triloka_search:
     build: .
     container_name: triloka_search
     ports:
@@ -28,6 +28,12 @@ services:
       fi
       "
     restart: unless-stopped
+    networks:
+      - app-network
 
 volumes:
   chroma_data:
+
+networks:
+  app-network:
+    external: true
