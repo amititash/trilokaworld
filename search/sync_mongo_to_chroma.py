@@ -20,7 +20,7 @@ def sync():
     db = client_mongo[DB_NAME]
     destinations_col = db["destinations"]
     
-    destinations = list(destinations_col.find({}))
+    destinations = list(destinations_col.find({}).limit(1))
     if not destinations:
         print("No destinations found in MongoDB! Make sure you have seeded the database.")
         return

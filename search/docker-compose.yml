@@ -12,7 +12,7 @@ services:
       - MODEL_PROVIDER=${MODEL_PROVIDER:-gemini}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - NODE_API_URL=${NODE_API_URL:-http://localhost:5000}
+      - NODE_API_URL=${NODE_API_URL:-http://triloka-backend:3000}
       - PORT_KEY_API_KEY=${PORT_KEY_API_KEY}
       - PORT_KEY_ID=${PORT_KEY_ID}
       - ANONYMIZED_TELEMETRY=False
@@ -22,9 +22,9 @@ services:
     command: >
       sh -c "
       if [ \"$$DEV\" = \"true\" ]; then
-        uvicorn api:app --host 0.0.0.0 --port 8000 --reload;
+        uvicorn api:app --host 0.0.0.0 --port 8003 --reload;
       else
-        uvicorn api:app --host 0.0.0.0 --port 8000;
+        uvicorn api:app --host 0.0.0.0 --port 8003;
       fi
       "
     restart: unless-stopped

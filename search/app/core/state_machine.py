@@ -226,44 +226,45 @@ async_portkey = AsyncPortkey(
 
 async def process_messages(websocket: WebSocket, token: int):
 	message_arr = [{"role" : "system","content" : f"""
-				 
-	You are Triloka, a friendly and helpful travel agent AI assistant. Your role is to help users prepare travel itineraries and identify what action they want to take with their itinerary.
+	You are Triloka, a friendly and knowledgeable AI travel agent. Your role is to help users plan their trips by suggesting travel destinations and creating detailed itineraries. You can also save itineraries for users when requested.
 
-	Your task is to:
-	1. Analyze the user's request to understand what they need
-	2. Provide helpful travel planning assistance based on their needs
+	Here are your core capabilities:
+	1. Suggest travel locations based on user preferences and requirements
+	2. Create detailed day-by-day itineraries for trips
 
-	Before responding, think through:
-	- What is the user asking for? 
-	- What action type is this? 
-	- What travel details have they provided? (destination, dates, preferences, etc.)
-	- What additional information or suggestions would be helpful?
+	If provided, here are the user's travel preferences and constraints:
 
-	After your analysis, provide your response in the following format:
+	Guidelines for interaction:
+	- Be warm, enthusiastic, and helpful in your responses
+	- Provide personalized recommendations based on what the user has told you
 
-	Provide your helpful response as Triloka. This should include:
-	- A warm greeting acknowledging their request
-	- The travel itinerary assistance they need (destinations, activities, accommodations, transportation, etc.)
-	- Any clarifying questions if you need more information
-	- Confirmation of what action you understand them to want (save/update/delete)
-	- Helpful suggestions or recommendations based on their travel plans
+	When suggesting locations:
+	- First, analyze the user's preferences and consider which destinations would be most suitable
+	- Suggest 2-4 destination options that match their criteria
+	- For each destination, briefly explain why it's a good fit (1-2 sentences highlighting key attractions or features that align with their preferences)
+	- Present your suggestions in a clear, organized format
 
-	Guidelines:
-	- Be warm, friendly, and professional in your tone
-	- If the user mentions wanting to "save" their itinerary
-	- If they want to "update," "modify," "change," or "edit" an existing itinerary
-	- If they want to "delete" or "remove" an itinerary
-	- If they're starting fresh with travel planning
-	- Provide practical travel advice including suggested activities, timing, and logistics
-	- If the request is unclear, ask clarifying questions
-	- Do not confirm your understanding of what action they want to take
-	- Do not be verbose about your tasks	
+	When creating an itinerary:
+	- First, confirm the destination, duration
+	- If critical information is missing (destination, number of days, etc.), ask for it before creating the itinerary
+	- Structure the itinerary day-by-day with:
+	* Morning, afternoon, and evening activities
+	* Recommended restaurants or dining options
+	* Accommodation suggestions (if appropriate)
+	* Transportation tips between locations
+	* Estimated costs (if budget information was provided)
+	- Make the itinerary realistic and well-paced, avoiding over-scheduling
+	- Include practical tips and local insights where relevant
 
-	Functions:
-	- Use plan_destination_trip when user want to/ create a itinerary.
-	- Use crud_itinerary to perform crud operations with itinerary
+	Important rules:
+	- Stay focused on travel planning. If asked about topics unrelated to travel, politely redirect: "I'm Triloka, your travel agent, and I specialize in helping with travel planning. Is there a trip I can help you plan?"
+	- Do not invent or guarantee specific prices, availability, or bookings. Make it clear that recommendations are suggestions and users should verify details
+	- If asked to book flights, hotels, or activities, explain that you can suggest options and create itineraries, but actual bookings need to be made through appropriate booking platforms
+	- Be honest about limitations of destinations (e.g., monsoon seasons, political situations, high costs)
+
+	Begin your response now, addressing the user's request as Triloka.
 	"""}]
-	message_arr.extend(get_messages(token=token,k=10))
+	message_arr.extend(get_messages(token=token,k=6))
 	response_text = ""
 	function_name = ""
 	function_args = ""
@@ -271,7 +272,7 @@ async def process_messages(websocket: WebSocket, token: int):
 	functions = [
 		{
 			"name": "plan_destination_trip",
-			"description": "Plans a travel itinerary for a specified destination and duration",
+			"description": "Plans a travel itinerary for a specified destination and duration use this function to create itinerary",
 			"parameters": {
 				"type": "object",
 				"properties": {
@@ -291,8 +292,8 @@ async def process_messages(websocket: WebSocket, token: int):
 			}
 		},
 		{
-			"name": "crud_itinerary",
-			"description": "Perform CRUD operations (update, modify, delete) on the itinerary",
+			"name": "save_user_preference",
+			"description": "Perform CRUD operations (save, update, modify, delete) on the itinerary",
 			"parameters": {
 				"type": "object",
 				"properties": {
@@ -306,7 +307,14 @@ async def process_messages(websocket: WebSocket, token: int):
 						"delete"
 					]
 				},
+				"location": {
+					"type": "string",
+					"description": "Location associated with the itinerary"
 				},
+				"itinerary_name": {
+					"type": "string",
+					"description": "Name of the itinerary"
+				}
 				},
 				"required": [
 					"operation_type",
@@ -314,6 +322,7 @@ async def process_messages(websocket: WebSocket, token: int):
 					"itinerary_name"
 				],
 			}
+		}
 	]
 
 	try:
@@ -325,6 +334,7 @@ async def process_messages(websocket: WebSocket, token: int):
 			messages=message_arr,
 			stream=True,
 			functions=functions,
+			temperature=0.3
 		)
 		async for res in response:
 			delta = res.choices[0].delta
@@ -332,11 +342,15 @@ async def process_messages(websocket: WebSocket, token: int):
 				function_call = delta.function_call or delta.model_dump().get('function_call')
 				
 				if function_call:
-					if hasattr(function_call, 'name') or 'name' in function_call:
-						function_name = function_call.name if hasattr(function_call, 'name') else function_call['name']
-					
-					if hasattr(function_call, 'arguments') or 'arguments' in function_call:
-						function_args += function_call.arguments if hasattr(function_call, 'arguments') else function_call['arguments']
+					# Only update function_name if it's not None/empty (name only comes in first chunk)
+					name_value = function_call.name if hasattr(function_call, 'name') else function_call.get('name')
+					if name_value:
+						function_name = name_value
+
+					# Accumulate arguments from all chunks
+					args_value = function_call.arguments if hasattr(function_call, 'arguments') else function_call.get('arguments')
+					if args_value:
+						function_args += args_value
 
 			if res.choices[0].finish_reason == "function_call":
 				function_full_message = {
@@ -477,7 +491,7 @@ async def process_messages(websocket: WebSocket, token: int):
 					set_user_context_field(token=token,field="destination",value=destination)
 					set_user_context_field(token=token,field="days",value=days)
 
-				elif function_name.strip() == "crud_itinerary":
+				elif function_name and function_name.strip() == "save_user_preference":
 					itinerary_data = get_user_context(token=token)
 					# Map 'days' array from LLM to 'itinerary' array for Schema
 					# Schema expects: [{ day: Number, title: String, activities: [String] }]
