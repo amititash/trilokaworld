@@ -226,7 +226,7 @@ async_portkey = AsyncPortkey(
 
 async def process_messages(websocket: WebSocket, token: int):
 	message_arr = [{"role" : "system","content" : f"""
-	You are Triloka, a friendly and knowledgeable AI travel agent. Your role is to help users plan their trips by suggesting travel destinations and creating detailed itineraries. You can also save itineraries for users when requested.
+	You are Triloka, a friendly and knowledgeable AI travel agent. Your role is to help users plan their trips by suggesting travel destinations and creating detailed itineraries. 
 
 	Here are your core capabilities:
 	1. Suggest travel locations based on user preferences and requirements
@@ -238,23 +238,9 @@ async def process_messages(websocket: WebSocket, token: int):
 	- Be warm, enthusiastic, and helpful in your responses
 	- Provide personalized recommendations based on what the user has told you
 
-	When suggesting locations:
-	- First, analyze the user's preferences and consider which destinations would be most suitable
-	- Suggest 2-4 destination options that match their criteria
-	- For each destination, briefly explain why it's a good fit (1-2 sentences highlighting key attractions or features that align with their preferences)
-	- Present your suggestions in a clear, organized format
-
 	When creating an itinerary:
 	- First, confirm the destination, duration
 	- If critical information is missing (destination, number of days, etc.), ask for it before creating the itinerary
-	- Structure the itinerary day-by-day with:
-	* Morning, afternoon, and evening activities
-	* Recommended restaurants or dining options
-	* Accommodation suggestions (if appropriate)
-	* Transportation tips between locations
-	* Estimated costs (if budget information was provided)
-	- Make the itinerary realistic and well-paced, avoiding over-scheduling
-	- Include practical tips and local insights where relevant
 
 	Important rules:
 	- Stay focused on travel planning. If asked about topics unrelated to travel, politely redirect: "I'm Triloka, your travel agent, and I specialize in helping with travel planning. Is there a trip I can help you plan?"
@@ -291,38 +277,38 @@ async def process_messages(websocket: WebSocket, token: int):
 				],
 			}
 		},
-		{
-			"name": "save_user_preference",
-			"description": "Perform CRUD operations (save, update, modify, delete) on the itinerary",
-			"parameters": {
-				"type": "object",
-				"properties": {
-				"operation_type": {
-					"type": "string",
-					"description": "Type of operation to perform on the itinerary",
-					"enum": [
-						"save",
-						"update",
-						"modify",
-						"delete"
-					]
-				},
-				"location": {
-					"type": "string",
-					"description": "Location associated with the itinerary"
-				},
-				"itinerary_name": {
-					"type": "string",
-					"description": "Name of the itinerary"
-				}
-				},
-				"required": [
-					"operation_type",
-					"location",
-					"itinerary_name"
-				],
-			}
-		}
+		# {
+		# 	"name": "save_user_preference",
+		# 	"description": "Perform CRUD operations (save, update, modify, delete) on the itinerary",
+		# 	"parameters": {
+		# 		"type": "object",
+		# 		"properties": {
+		# 		"operation_type": {
+		# 			"type": "string",
+		# 			"description": "Type of operation to perform on the itinerary",
+		# 			"enum": [
+		# 				"save",
+		# 				"update",
+		# 				"modify",
+		# 				"delete"
+		# 			]
+		# 		},
+		# 		"location": {
+		# 			"type": "string",
+		# 			"description": "Location associated with the itinerary"
+		# 		},
+		# 		"itinerary_name": {
+		# 			"type": "string",
+		# 			"description": "Name of the itinerary"
+		# 		}
+		# 		},
+		# 		"required": [
+		# 			"operation_type",
+		# 			"location",
+		# 			"itinerary_name"
+		# 		],
+		# 	}
+		# }
 	]
 
 	try:
@@ -491,7 +477,7 @@ async def process_messages(websocket: WebSocket, token: int):
 					set_user_context_field(token=token,field="destination",value=destination)
 					set_user_context_field(token=token,field="days",value=days)
 
-				elif function_name and function_name.strip() == "save_user_preference":
+				# elif function_name and function_name.strip() == "save_user_preference":
 					itinerary_data = get_user_context(token=token)
 					# Map 'days' array from LLM to 'itinerary' array for Schema
 					# Schema expects: [{ day: Number, title: String, activities: [String] }]
@@ -516,12 +502,12 @@ async def process_messages(websocket: WebSocket, token: int):
 					if res and res.get("success"):
 						# self.context["trip_id"] = res.get("trip", {}).get("_id") # Node returns { success
 						set_user_context_field(token=token,field="trip_id",value=res.get("trip", {}).get("_id"))
-						yield "Successfully saved your itinerary!"
-						add_message(token=token,message="Successfully saved your itinerary!",role="system")
-					else:
-						error_msg = res.get("error", "Unknown error") if res else "Failed to save trip"
-						yield f"Failed to save itinerary: {error_msg}"
-						add_message(token=token,message=f"Failed to save itinerary: {error_msg}",role="system")
+						# yield "Successfully saved your itinerary!"
+						# add_message(token=token,message="Successfully saved your itinerary!",role="system")
+					# else:
+						# error_msg = res.get("error", "Unknown error") if res else "Failed to save trip"
+						# yield f"Failed to save itinerary: {error_msg}"
+						# add_message(token=token,message=f"Failed to save itinerary: {error_msg}",role="system")
 			elif res.choices[0].delta.content:
 				response_text += res.choices[0].delta.content
 				
